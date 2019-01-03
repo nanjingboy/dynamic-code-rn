@@ -1,15 +1,68 @@
 package com.dynamiccodern;
 
-import com.facebook.react.ReactActivity;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
+import android.view.View;
 
-public class DynamicActivity extends ReactActivity {
+import com.facebook.react.ReactRootView;
+import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 
-    /**
-     * Returns the name of the main component registered from JavaScript.
-     * This is used to schedule rendering of the component.
-     */
+public class DynamicActivity extends AppCompatActivity implements DefaultHardwareBackBtnHandler {
+
+    private ReactRootView mReactRootView;
+    private DynamicReactActivityDelegate mDelegate;
+
     @Override
-    protected String getMainComponentName() {
-        return "DynamicCodeRN";
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_dynamic);
+        findViewById(R.id.goBackBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        mDelegate = new DynamicReactActivityDelegate(this, getIntent().getStringExtra("filePath"));
+        mReactRootView = findViewById(R.id.reactRootView);
+        mReactRootView.startReactApplication(mDelegate.getReactInstanceManager(), "DynamicCodeRN");
+    }
+
+
+    @Override
+    public void invokeDefaultOnBackPressed() {
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mDelegate.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mDelegate.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDelegate.onDestroy();
+        if (mReactRootView != null) {
+            mReactRootView.unmountReactApplication();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        mDelegate.onBackPressed();
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        return mDelegate.onKeyUp(keyCode, event) || super.onKeyUp(keyCode, event);
     }
 }

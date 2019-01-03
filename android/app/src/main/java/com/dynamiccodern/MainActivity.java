@@ -1,10 +1,12 @@
 package com.dynamiccodern;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,7 +38,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void runDynamicCode(String version) {
-        Intent intent = new Intent(this, DynamicActivity.class);
-        startActivity(intent);
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("下载中...");
+        DownloadTask task = new DownloadTask(new DownloadTask.IDownloadTaskListener() {
+            @Override
+            public void onPreExecute() {
+                progressDialog.show();
+            }
+
+            @Override
+            public void onPostExecute(String filePath) {
+                progressDialog.dismiss();
+                if (filePath == null) {
+                    Toast.makeText(MainActivity.this, "下载失败", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(MainActivity.this, DynamicActivity.class);
+                    intent.putExtra("filePath", filePath);
+                    startActivity(intent);
+                }
+            }
+        });
+        task.execute(version);
     }
 }
