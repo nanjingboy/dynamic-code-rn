@@ -31,6 +31,9 @@ PODS:
     - React/Core
   - React/RCTBlob (0.57.8):
     - React/Core
+  - React/RCTImage (0.57.8):
+    - React/Core
+    - React/RCTNetwork
   - React/RCTNetwork (0.57.8):
     - React/Core
   - React/RCTText (0.57.8):
@@ -39,6 +42,7 @@ PODS:
     - React/Core
     - React/fishhook
     - React/RCTBlob
+  - SSZipArchive (2.1.4)
   - Toast (4.0.0)
   - yoga (0.57.8.React)
 
@@ -51,9 +55,11 @@ DEPENDENCIES:
   - React/CxxBridge (from `../node_modules/react-native`)
   - React/DevSupport (from `../node_modules/react-native`)
   - React/RCTAnimation (from `../node_modules/react-native`)
+  - React/RCTImage (from `../node_modules/react-native`)
   - React/RCTNetwork (from `../node_modules/react-native`)
   - React/RCTText (from `../node_modules/react-native`)
   - React/RCTWebSocket (from `../node_modules/react-native`)
+  - SSZipArchive
   - Toast (~> 4.0.0)
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -61,6 +67,7 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - boost-for-react-native
     - Masonry
+    - SSZipArchive
     - Toast
 
 EXTERNAL SOURCES:
@@ -82,9 +89,10 @@ SPEC CHECKSUMS:
   glog: e8acf0ebbf99759d3ff18c86c292a5898282dcde
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   React: 1fe0eb13d90b625d94c3b117c274dcfd2e760e11
+  SSZipArchive: 41455d4b8d2b6ab93990820b50dc697c2554a322
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   yoga: b1ce48b6cf950b98deae82838f5173ea7cf89e85
 
-PODFILE CHECKSUM: d523f00ba80c0f7b8bfacd8d2457b73093d14e42
+PODFILE CHECKSUM: bc8d50b11c287a4e7e6486b2e1a5ddba8c9ec8dd
 
 COCOAPODS: 1.5.3

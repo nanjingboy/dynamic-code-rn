@@ -6,6 +6,7 @@ target 'DynamicCodeRN' do
     'CxxBridge', # Include this for RN >= 0.47
     'DevSupport', # Include this to enable In-App Devmenu if RN >= 0.43
     'RCTText',
+    'RCTImage',
     'RCTNetwork',
     'RCTWebSocket', # Needed for debugging
     'RCTAnimation', # Needed for FlatList and animations running on native UI thread
@@ -20,4 +21,5 @@ target 'DynamicCodeRN' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   pod 'Masonry'
   pod 'Toast', '~> 4.0.0'
+  pod 'SSZipArchive'
 end

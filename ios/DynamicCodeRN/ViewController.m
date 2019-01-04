@@ -1,6 +1,7 @@
 #import "DynamicViewController.h"
 #import "ViewController.h"
 #import "UIView+Toast.h"
+#import "SSZipArchive.h"
 #import "Masonry.h"
 
 @interface ViewController ()
@@ -66,7 +67,7 @@
     } else {
         version = @"1.1.0";
     }
-    NSString *sourceCodeUrl = [NSString stringWithFormat:@"http://10.0.27.63:8080/%@/index.ios.bundle", version];
+    NSString *sourceCodeUrl = [NSString stringWithFormat:@"http://127.0.0.1:8080/%@/ios.zip", version];
     [self.view makeToastActivity:CSToastPositionCenter];
     
     __weak __typeof(self)weakSelf = self;
@@ -75,12 +76,20 @@
         NSData *data = [NSData dataWithContentsOfURL:url];
         __strong __typeof(weakSelf)strongSelf = weakSelf;
         if (data) {
-            NSURL *distFileUrl = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-            distFileUrl = [distFileUrl URLByAppendingPathComponent:@"index.ios.bundle"];
-            if ([data writeToURL:distFileUrl atomically:NO]) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [strongSelf downloadCallback:distFileUrl.absoluteString];
-                });
+            NSURL *distRootUrl = [strongSelf getDistFileUrl:version];
+            NSURL *distZipUrl = [distRootUrl URLByAppendingPathComponent:@"ios.zip"];
+            if ([data writeToURL:distZipUrl atomically:NO]) {
+                BOOL upzipStatus = [SSZipArchive unzipFileAtPath:distZipUrl.path toDestination:distRootUrl.path];
+                if (upzipStatus) {
+                    [[NSFileManager defaultManager] removeItemAtURL:distZipUrl error:nil];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [strongSelf downloadCallback:[distRootUrl URLByAppendingPathComponent:@"index.bundle"].path];
+                    });
+                } else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [strongSelf downloadCallback:nil];
+                    });
+                }
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [strongSelf downloadCallback:nil];
@@ -103,6 +112,17 @@
         controller.jsSourcePath = filePath;
         [self presentViewController:controller animated:YES completion:nil];
     }
+}
+
+- (NSURL *)getDistFileUrl:(NSString *)version {
+    NSURL *url = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+    url = [url URLByAppendingPathComponent:version isDirectory:YES];
+    NSFileManager *manager = [NSFileManager defaultManager];
+    if ([manager fileExistsAtPath:url.path]) {
+        [manager removeItemAtURL:url error:nil];
+    }
+    [manager createDirectoryAtURL:url withIntermediateDirectories:NO attributes:nil error:nil];
+    return url;
 }
 
 @end
