@@ -21,5 +21,12 @@ $ yarn install
 $ yarn res-server
 ```
 
+* `iOS` 依赖安装：
+
+```shell
+$ cd dynamic-code-rn/ios
+$ pod install
+```
+
 * 用 `XCode` 或 `Android Studio` 打开 `ios` 或 `android` 目录，按照传统方式编译运行即可。
 
