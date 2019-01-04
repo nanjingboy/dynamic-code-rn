@@ -11,6 +11,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import ir.mahdi.mzip.zip.ZipArchive;
+
 public class DownloadTask extends AsyncTask<String, Integer, String> {
 
     private IDownloadTaskListener mListener;
@@ -35,14 +37,15 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
     protected String doInBackground(String... params) {
         try {
             String version = params[0];
-            URL url = new URL(String.format("http://10.0.27.63:8080/%s/index.android.bundle", version));
+            URL url = new URL(String.format("http://10.0.3.2:8080/%s/android.zip", version));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
             int code = connection.getResponseCode();
             if (code != 200) {
                 return null;
             }
-            File file = new File(getDistFilePath(version), "index.android.bundle");
+            String basePath = getDistFilePath(version);
+            File file = new File(basePath, "android.zip");
             FileOutputStream fileOutput = new FileOutputStream(file);
             InputStream inputStream = connection.getInputStream();
             byte[] buffer = new byte[1024];
@@ -51,7 +54,9 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
                 fileOutput.write(buffer, 0, bufferLength);
             }
             fileOutput.close();
-            return file.getAbsolutePath();
+            ZipArchive.unzip(file.getAbsolutePath(), String.format("%s/android", basePath), "");
+            remove(file);
+            return String.format("%s/android/index.bundle", basePath);
         } catch (MalformedURLException e) {
             return null;
         } catch (IOException e) {
@@ -72,7 +77,26 @@ public class DownloadTask extends AsyncTask<String, Integer, String> {
                 Environment.getExternalStorageDirectory().getAbsolutePath(),
                 BuildConfig.APPLICATION_ID, version
         );
-        (new File(path)).mkdirs();
+        File file = new File(path);
+        remove(file);
+        file.mkdirs();
         return path;
+    }
+
+    private void remove(File file) {
+        if (!file.exists()) {
+            return;
+        }
+
+        if (file.isDirectory()) {
+            for (File child: file.listFiles()) {
+                if (child.isDirectory()) {
+                    remove(child);
+                } else {
+                    child.delete();
+                }
+            }
+        }
+        file.delete();
     }
 }
